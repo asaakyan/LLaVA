@@ -1,20 +1,26 @@
 #!/bin/bash
 
-deepspeed llava/train/train_mem.py \
-    --deepspeed ./scripts/zero3.json \
-    --model_name_or_path liuhaotian/llava-v1.5-13b \
+export WANDB_PROJECT=llava-tune
+export TRANSFORMERS_CACHE=/mnt/swordfish-pool2/models/transformers_cache
+export MODEL=$TRANSFORMERS_CACHE/llava-v1.6-mistral-7b
+export VISENTAIL=/mnt/swordfish-pool2/asaakyan/visEntail
+export DATA=$VISENTAIL/data/LLaVA-Instruct-150K/detail_23k.json
+
+deepspeed ../../llava/train/train_mem.py \
+    --deepspeed ../zero3.json \
+    --model_name_or_path $MODEL \
     --version v1 \
-    --data_path ./playground/data/llava_v1_5_mix665k.json \
-    --image_folder ./playground/data \
+    --data_path $DATA \
+    --output_dir $VISENTAIL/checkpoints/$MODEL-test \
+    --group_by_modality_length False \
+    --image_folder $VISENTAIL/data/coco/train2017 \
     --vision_tower openai/clip-vit-large-patch14-336 \
     --mm_projector_type mlp2x_gelu \
     --mm_vision_select_layer -2 \
     --mm_use_im_start_end False \
     --mm_use_im_patch_token False \
     --image_aspect_ratio pad \
-    --group_by_modality_length True \
     --bf16 True \
-    --output_dir ./checkpoints/llava-v1.5-13b-task \
     --num_train_epochs 1 \
     --per_device_train_batch_size 16 \
     --per_device_eval_batch_size 4 \

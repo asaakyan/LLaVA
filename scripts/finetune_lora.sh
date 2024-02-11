@@ -10,16 +10,19 @@
 ################## VICUNA ##################
 
 ################## LLaMA-2 ##################
-# PROMPT_VERSION="llava_llama_2"
-# MODEL_VERSION="llama-2-7b-chat"
+PROMPT_VERSION="llava_llama_2"
+MODEL_VERSION="llama-2-7b-chat"
 ################## LLaMA-2 ##################
+
+export WANDB_PROJECT=llava-tune
+export TRANSFORMERS_CACHE=/mnt/swordfish-pool2/models/transformers_cache
 
 deepspeed llava/train/train_mem.py \
     --deepspeed ./scripts/zero2.json \
     --lora_enable True \
-    --model_name_or_path ./checkpoints/$MODEL_VERSION \
+    --model_name_or_path /mnt/swordfish-pool2/models/transformers_cache/$MODEL_VERSION \
     --version $PROMPT_VERSION \
-    --data_path ./playground/data/llava_instruct_80k.json \
+    --data_path ../playground/data/llava_instruct_80k.json \
     --image_folder /path/to/coco/train2017 \
     --vision_tower openai/clip-vit-large-patch14 \
     --pretrain_mm_mlp_adapter ./checkpoints/llava-$MODEL_VERSION-pretrain/mm_projector.bin \
