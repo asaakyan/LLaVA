@@ -51,7 +51,10 @@ def load_pretrained_model(model_path, model_base, model_name, load_8bit=False, l
             warnings.warn('There is `lora` in model name but no `model_base` is provided. If you are loading a LoRA model, please provide the `model_base` argument. Detailed instruction: https://github.com/haotian-liu/LLaVA#launch-a-model-worker-lora-weights-unmerged.')
         if 'lora' in model_name.lower() and model_base is not None:
             from llava.model.language_model.llava_llama import LlavaConfig
-            lora_cfg_pretrained = LlavaConfig.from_pretrained(model_path)
+            if 'checkpoint' in model_path:
+                lora_cfg_pretrained = LlavaConfig.from_pretrained(os.path.join("/".join(model_path.split("/")[:-1])))
+            else:
+                lora_cfg_pretrained = LlavaConfig.from_pretrained(model_path)
             tokenizer = AutoTokenizer.from_pretrained(model_base, use_fast=False)
             print('Loading LLaVA from base model...')
             model = LlavaLlamaForCausalLM.from_pretrained(model_base, low_cpu_mem_usage=True, config=lora_cfg_pretrained, **kwargs)
@@ -63,6 +66,8 @@ def load_pretrained_model(model_path, model_base, model_name, load_8bit=False, l
             print('Loading additional LLaVA weights...')
             if os.path.exists(os.path.join(model_path, 'non_lora_trainables.bin')):
                 non_lora_trainables = torch.load(os.path.join(model_path, 'non_lora_trainables.bin'), map_location='cpu')
+            elif os.path.exists(os.path.join("/".join(model_path.split("/")[:-1]), 'non_lora_trainables.bin')):
+                non_lora_trainables = torch.load(os.path.join("/".join(model_path.split("/")[:-1]), 'non_lora_trainables.bin'), map_location='cpu')
             else:
                 # this is probably from HF Hub
                 from huggingface_hub import hf_hub_download
