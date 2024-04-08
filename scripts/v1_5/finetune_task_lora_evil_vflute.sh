@@ -1,22 +1,22 @@
 #!/bin/bash
 
-export WANDB_PROJECT=llava-tune-vflute1-val
+export WANDB_PROJECT=llava-tune-evil-vflute
 export TRANSFORMERS_CACHE=/mnt/swordfish-pool2/models/transformers_cache
 export MODEL=llava-v1.6-mistral-7b
 export VISENTAIL=/mnt/swordfish-pool2/asaakyan/visEntail
 export DATA_DIR=../../../data/flute-v-llava
 
 deepspeed ../../llava/train/train_mem.py \
-    --seed 5423 \
+    --seed 42 \
     --lora_enable True --lora_r 128 --lora_alpha 256 --mm_projector_lr 2e-5 \
     --deepspeed ../zero3.json \
     --model_name_or_path $TRANSFORMERS_CACHE/$MODEL \
     --version v1 \
-    --data_path $DATA_DIR/train_data_v3.json \
-    --eval_data_path $DATA_DIR/valid_data_v3.json \
-    --output_dir $VISENTAIL/checkpoints/$MODEL-vflute-v3-lora-seed5423 \
+    --data_path $DATA_DIR/train_data_evil_flute.json \
+    --eval_data_path $DATA_DIR/valid_data_evil_flute.json \
+    --output_dir $VISENTAIL/checkpoints/$MODEL-evil-vflute-v1-lora \
     --group_by_modality_length False \
-    --image_folder $VISENTAIL/data/v-flute \
+    --image_folder $VISENTAIL/data/ \
     --vision_tower openai/clip-vit-large-patch14-336 \
     --mm_projector_type mlp2x_gelu \
     --mm_vision_select_layer -2 \

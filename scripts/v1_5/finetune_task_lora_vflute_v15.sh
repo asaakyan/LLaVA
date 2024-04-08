@@ -2,19 +2,19 @@
 
 export WANDB_PROJECT=llava-tune-vflute1-val
 export TRANSFORMERS_CACHE=/mnt/swordfish-pool2/models/transformers_cache
-export MODEL=llava-v1.6-mistral-7b
+export MODEL=llava-v1.5-7b
 export VISENTAIL=/mnt/swordfish-pool2/asaakyan/visEntail
 export DATA_DIR=../../../data/flute-v-llava
 
 deepspeed ../../llava/train/train_mem.py \
-    --seed 5423 \
+    --seed 42 \
     --lora_enable True --lora_r 128 --lora_alpha 256 --mm_projector_lr 2e-5 \
     --deepspeed ../zero3.json \
     --model_name_or_path $TRANSFORMERS_CACHE/$MODEL \
     --version v1 \
     --data_path $DATA_DIR/train_data_v3.json \
     --eval_data_path $DATA_DIR/valid_data_v3.json \
-    --output_dir $VISENTAIL/checkpoints/$MODEL-vflute-v3-lora-seed5423 \
+    --output_dir $VISENTAIL/checkpoints/$MODEL-vflute-lora \
     --group_by_modality_length False \
     --image_folder $VISENTAIL/data/v-flute \
     --vision_tower openai/clip-vit-large-patch14-336 \
@@ -24,7 +24,7 @@ deepspeed ../../llava/train/train_mem.py \
     --mm_use_im_patch_token False \
     --image_aspect_ratio pad \
     --bf16 True \
-    --num_train_epochs 4 \
+    --num_train_epochs 10 \
     --per_device_train_batch_size 16 \
     --per_device_eval_batch_size 4 \
     --gradient_accumulation_steps 1 \
